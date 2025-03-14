@@ -1,0 +1,9 @@
+spring:
+  cloud:
+    config:
+      name: gatewayservice
+      profile: ${SPRING_PROFILES_ACTIVE:prod} # 配置環境，默認為 dev
+      uri: ${CONFIG_SERVER_URI:http://127.0.0.1:8888/} # 配置服務的 URI，默認指向本地的 Config Server
+      username: ${CONFIG_SERVER_USERNAME:admin} # 用於身份驗證的用戶名，默認為 admin
+      password: ${CONFIG_SERVER_PASSWORD:password} # 用於身份驗證的密碼，默認為 password
+      fail-fast: false  # 如果 Config Server 無法啟動，避免應用立即報錯，默認為 false
