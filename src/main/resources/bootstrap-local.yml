@@ -1,0 +1,19 @@
+spring:
+  cloud:
+    config:
+      enabled: false # 本地環境不連接 Config Server
+    gateway:
+      discovery:
+        locator:
+          enabled: false # 不啟用服務發現
+      routes:
+        - id: gatewayservice
+          uri: http://localhost:8080 # 使用固定地址
+          predicates:
+            - Path=/api/v1/gateway/**
+          filters:
+            - StripPrefix=3 # 去掉 /api/v1/gateway 前缀
+
+eureka:
+  client:
+    enabled: false # 本地環境不使用 Eureka
