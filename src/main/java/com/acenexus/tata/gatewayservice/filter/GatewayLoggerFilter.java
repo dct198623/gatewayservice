@@ -22,9 +22,9 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.G
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR;
 
 @Component
-public class EnhancedLoggingGlobalFilter implements GlobalFilter, Ordered {
+public class GatewayLoggerFilter implements GlobalFilter, Ordered {
 
-    private static final Logger log = LoggerFactory.getLogger(EnhancedLoggingGlobalFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(GatewayLoggerFilter.class);
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private static final Set<String> SENSITIVE_HEADERS = Set.of("authorization", "cookie", "jwt", "api-key");
 
