@@ -41,16 +41,14 @@ public class GatewayLoggerFilter implements GlobalFilter, Ordered {
         // 記錄請求開始
         log.info("[REQUEST START] requestId={} | method={} | path={} | clientIP={} | timestamp={}", requestId, method, path, clientIP, formatter.format(startTime));
 
-        // Debug 級別記錄請求頭 (排除敏感信息)
-        if (log.isDebugEnabled()) {
-            request.getHeaders().forEach((name, values) -> {
-                if (SENSITIVE_HEADERS.contains(name.toLowerCase())) {
-                    log.debug("[REQUEST HEADER] requestId={} | {}=[PROTECTED]", requestId, name);
-                } else {
-                    values.forEach(value -> log.debug("[REQUEST HEADER] requestId={} | {}={}", requestId, name, value));
-                }
-            });
-        }
+        // 排除敏感訊息
+        request.getHeaders().forEach((name, values) -> {
+            if (SENSITIVE_HEADERS.contains(name.toLowerCase())) {
+                log.debug("[REQUEST HEADER] requestId={} | {}=[PROTECTED]", requestId, name);
+            } else {
+                values.forEach(value -> log.debug("[REQUEST HEADER] requestId={} | {}={}", requestId, name, value));
+            }
+        });
 
         return chain.filter(exchange)
                 .then(Mono.fromRunnable(() -> {
