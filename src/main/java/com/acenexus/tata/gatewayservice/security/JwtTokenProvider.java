@@ -74,7 +74,7 @@ public class JwtTokenProvider {
         return extractAllClaims(token).getExpiration();
     }
 
-    private static Claims extractAllClaims(String token) {
+    public static Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(signingKey)
                 .build()
