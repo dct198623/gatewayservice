@@ -1,4 +1,4 @@
-package com.acenexus.tata.gatewayservice.security;
+package com.acenexus.tata.gatewayservice.provider;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
