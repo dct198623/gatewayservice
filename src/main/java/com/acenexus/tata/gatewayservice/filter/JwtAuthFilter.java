@@ -33,7 +33,8 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     // 不需要驗證 JWT 的路徑
     private static final List<String> EXCLUDED_PATHS = List.of(
-            "/api/gateway/login"
+            "/api/gateway/login",
+            "/api/gateway/refresh/token"
     );
 
     @Autowired

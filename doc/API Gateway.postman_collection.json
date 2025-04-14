@@ -33,41 +33,7 @@
 			"response": []
 		},
 		{
-			"name": "test",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6IkFjZSIsInN1YiI6IjEiLCJpYXQiOjE3NDQ2NDcxMDEsImV4cCI6MTc0NDY0ODAwMX0.q7Gm5VVHgSrdDSdfBO_Wm6bnfpNmaNRvG5eOWBdgD2A",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://127.0.0.1:8080/api/gateway/test",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"gateway",
-						"test"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "login test",
+			"name": "login",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -94,6 +60,77 @@
 						"api",
 						"gateway",
 						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "test",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6IkFjZSIsInN1YiI6IjEiLCJpYXQiOjE3NDQ2NDg3MzksImV4cCI6MTc0NDY0OTYzOX0.4nRFOlZtXd-s8bsJgD1llk55YPcdMOCyh1I-aIJvLDc",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8080/api/gateway/test",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"gateway",
+						"test"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "refreshToken",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicmVmcmVzaCIsInVzZXJOYW1lIjoiQWNlIiwic3ViIjoiMSIsImlhdCI6MTc0NDY0ODcxNiwiZXhwIjoxNzQ1MjUzNTE2fQ.hbkr8-3hM9RCWSU2hEoaRzxocISfb52EIGsECW74vDM\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8080/api/gateway/refresh/token",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"gateway",
+						"refresh",
+						"token"
 					]
 				}
 			},
