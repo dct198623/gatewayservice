@@ -22,9 +22,9 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.G
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR;
 
 @Component
-public class EnhancedLoggingGlobalFilter implements GlobalFilter, Ordered {
+public class GatewayLoggerFilter implements GlobalFilter, Ordered {
 
-    private static final Logger log = LoggerFactory.getLogger(EnhancedLoggingGlobalFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(GatewayLoggerFilter.class);
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private static final Set<String> SENSITIVE_HEADERS = Set.of("authorization", "cookie", "jwt", "api-key");
 
@@ -35,22 +35,20 @@ public class EnhancedLoggingGlobalFilter implements GlobalFilter, Ordered {
         LocalDateTime startTime = LocalDateTime.now();
         long startTimeMillis = System.currentTimeMillis();
         String clientIP = getClientIP(request);
-        String method = request.getMethod().name();
-        String path = request.getPath().value();
+        String httpMethod = request.getMethod().name();
+        String requestPath = request.getPath().value();
 
         // 記錄請求開始
-        log.info("[REQUEST START] requestId={} | method={} | path={} | clientIP={} | timestamp={}", requestId, method, path, clientIP, formatter.format(startTime));
+        log.info("[REQUEST START] requestId={} | httpMethod={} | requestPath={} | clientIP={} | timestamp={}", requestId, httpMethod, requestPath, clientIP, formatter.format(startTime));
 
-        // Debug 級別記錄請求頭 (排除敏感信息)
-        if (log.isDebugEnabled()) {
-            request.getHeaders().forEach((name, values) -> {
-                if (SENSITIVE_HEADERS.contains(name.toLowerCase())) {
-                    log.debug("[REQUEST HEADER] requestId={} | {}=[PROTECTED]", requestId, name);
-                } else {
-                    values.forEach(value -> log.debug("[REQUEST HEADER] requestId={} | {}={}", requestId, name, value));
-                }
-            });
-        }
+        // 排除敏感訊息
+        request.getHeaders().forEach((name, values) -> {
+            if (SENSITIVE_HEADERS.contains(name.toLowerCase())) {
+                log.debug("[REQUEST HEADER] requestId={} | {}=[PROTECTED]", requestId, name);
+            } else {
+                values.forEach(value -> log.debug("[REQUEST HEADER] requestId={} | {}={}", requestId, name, value));
+            }
+        });
 
         return chain.filter(exchange)
                 .then(Mono.fromRunnable(() -> {
@@ -67,16 +65,16 @@ public class EnhancedLoggingGlobalFilter implements GlobalFilter, Ordered {
 
                     // 記錄回應日誌
                     if (statusCode.is5xxServerError()) {
-                        log.error("[REQUEST END] requestId={} | method={} | path={} | status={} | route={} | target={} | duration={}ms", requestId, method, path, statusCode, routeId, target, executionTime);
+                        log.error("[REQUEST END] requestId={} | httpMethod={} | requestPath={} | status={} | route={} | target={} | duration={}ms", requestId, httpMethod, requestPath, statusCode, routeId, target, executionTime);
                     } else if (statusCode.is4xxClientError()) {
-                        log.warn("[REQUEST END] requestId={} | method={} | path={} | status={} | route={} | target={} | duration={}ms", requestId, method, path, statusCode, routeId, target, executionTime);
+                        log.warn("[REQUEST END] requestId={} | httpMethod={} | requestPath={} | status={} | route={} | target={} | duration={}ms", requestId, httpMethod, requestPath, statusCode, routeId, target, executionTime);
                     } else {
-                        log.info("[REQUEST END] requestId={} | method={} | path={} | status={} | route={} | target={} | duration={}ms", requestId, method, path, statusCode, routeId, target, executionTime);
+                        log.info("[REQUEST END] requestId={} | httpMethod={} | requestPath={} | status={} | route={} | target={} | duration={}ms", requestId, httpMethod, requestPath, statusCode, routeId, target, executionTime);
                     }
 
                     // 記錄慢請求
                     if (executionTime > 3000) { // 設定閾值，例如 3 秒
-                        log.warn("[SLOW REQUEST] requestId={} | method={} | path={} | duration={}ms (over threshold)", requestId, method, path, executionTime);
+                        log.warn("[SLOW REQUEST] requestId={} | httpMethod={} | requestPath={} | duration={}ms (over threshold)", requestId, httpMethod, requestPath, executionTime);
                     }
                 }));
     }

@@ -6,10 +6,6 @@ spring:
     active: ${SPRING_PROFILES_ACTIVE:local}
   application:
     name: gatewayservice
-  security:
-    user:
-      name: ${SECURITY_USERNAME:admin}
-      password: ${SECURITY_PASSWORD:password}
 
 logging:
   level:
