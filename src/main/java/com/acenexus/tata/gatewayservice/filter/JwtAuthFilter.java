@@ -26,12 +26,10 @@ import java.util.List;
 public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthFilter.class);
-
     private static final String BEARER_PREFIX = "Bearer ";
     private static final String UNAUTHORIZED_MSG = "Unauthorized";
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    // 不需要驗證 JWT 的路徑
     private static final List<String> EXCLUDED_PATHS = List.of(
             "/api/gateway/login",
             "/api/gateway/refresh/token"
@@ -42,17 +40,16 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        ServerHttpRequest request = exchange.getRequest();
-        String path = request.getURI().getPath();
+        String path = exchange.getRequest().getURI().getPath();
 
         if (isExcludedPath(path)) {
-            log.debug("Skip JWT check for path: {}", path);
+            log.debug("Skipping JWT validation for path: {}", path);
             return chain.filter(exchange);
         }
 
-        String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
-            log.warn("Missing or invalid Authorization header for path: {}", path);
+            log.warn("Invalid Authorization header for path: {}", path);
             return onError(exchange, UNAUTHORIZED_MSG, HttpStatus.UNAUTHORIZED);
         }
 
@@ -60,14 +57,13 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
         try {
             if (!jwtTokenProvider.validateToken(token)) {
-                log.warn("JWT token validation failed for path: {}", path);
+                log.warn("JWT validation failed for path: {}", path);
                 return onError(exchange, UNAUTHORIZED_MSG, HttpStatus.UNAUTHORIZED);
             }
 
-            Claims claims = jwtTokenProvider.extractAllClaims(token); // 確保從 provider 統一解析
+            Claims claims = jwtTokenProvider.extractAllClaims(token);
 
-            // 將 user 資訊傳給下游服務
-            ServerHttpRequest modifiedRequest = request.mutate()
+            ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
                     .header("X-User-ID", claims.getSubject())
                     .header("X-User-Name", claims.get("userName", String.class))
                     .build();
@@ -84,20 +80,23 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         return EXCLUDED_PATHS.stream().anyMatch(path::startsWith);
     }
 
-    public static <T> Mono<Void> onError(ServerWebExchange exchange, String message, HttpStatus status) {
-        ApiResponse<T> response = new ApiResponse<>(1, message);
+    private static <T> Mono<Void> onError(ServerWebExchange exchange, String message, HttpStatus status) {
+        ApiResponse<T> response = ApiResponse.error(message);
 
-        byte[] responseBytes;
-        try {
-            responseBytes = objectMapper.writeValueAsString(response).getBytes(StandardCharsets.UTF_8);
-        } catch (JsonProcessingException e) {
-            responseBytes = "{\"status\":1,\"message\":\"Server Error\"}".getBytes(StandardCharsets.UTF_8);
-        }
+        byte[] responseBytes = getResponseBytes(response);
 
         exchange.getResponse().setStatusCode(status);
         exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
         return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
                 .bufferFactory().wrap(responseBytes)));
+    }
+
+    private static <T> byte[] getResponseBytes(ApiResponse<T> response) {
+        try {
+            return objectMapper.writeValueAsString(response).getBytes(StandardCharsets.UTF_8);
+        } catch (JsonProcessingException e) {
+            return "{\"status\":1,\"message\":\"Server Error\"}".getBytes(StandardCharsets.UTF_8);
+        }
     }
 
     @Override
