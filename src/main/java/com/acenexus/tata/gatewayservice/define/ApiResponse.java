@@ -1,45 +1,22 @@
 package com.acenexus.tata.gatewayservice.define;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ApiResponse<T> {
     private int status;
-    private T data;
     private String message;
+    private T data;
 
-    public ApiResponse() {
+    public static <T> ApiResponse<T> success(T data) {
+        return new ApiResponse<>(0, "OK", data);
     }
 
-    public ApiResponse(int status, T data) {
-        this.status = status;
-        this.data = data;
+    public static <T> ApiResponse<T> error(String message) {
+        return new ApiResponse<>(1, message, null);
     }
-
-    public ApiResponse(int status, String message) {
-        this.status = status;
-        this.message = message;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
 }
