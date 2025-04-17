@@ -14,6 +14,13 @@ spring:
           filters:
             - StripPrefix=2 # 去掉 /api/gateway/ 前缀
 
+        - id: accountservice
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/account/**
+          filters:
+            - StripPrefix=2 # 去掉 /api/account/ 前缀
+
 eureka:
   client:
     enabled: false # 本地環境不使用 Eureka
