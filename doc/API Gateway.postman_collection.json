@@ -10,18 +10,26 @@
 		{
 			"name": "gateway",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InVzZXIwMDEiLCJzdWIiOiIxIiwiaWF0IjoxNzQ0OTEwOTUwLCJleHAiOjE3NDQ5MTE4NTB9.dzkVzhMCiR7813Hje6TQdSvL2rvJUx9PJeQy85r_mUk",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:8080/api/gateway/actuator/health",
-					"protocol": "http",
+					"raw": "https://6b45-3-27-141-54.ngrok-free.app/api/gateway/actuator/health",
+					"protocol": "https",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"6b45-3-27-141-54",
+						"ngrok-free",
+						"app"
 					],
-					"port": "8080",
 					"path": [
 						"api",
 						"gateway",
@@ -47,18 +55,17 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8080/api/gateway/login",
-					"protocol": "http",
+					"raw": "https://6b45-3-27-141-54.ngrok-free.app/api/gateway/v1/login",
+					"protocol": "https",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"6b45-3-27-141-54",
+						"ngrok-free",
+						"app"
 					],
-					"port": "8080",
 					"path": [
 						"api",
 						"gateway",
+						"v1",
 						"login"
 					]
 				}
@@ -73,7 +80,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InVzZXIwMDEiLCJzdWIiOiIxIiwiaWF0IjoxNzQ0NzEwNzk5LCJleHAiOjE3NDQ3MTE2OTl9.tIzfifo7uxB3XXkKJVNAOyYGNKWqZ5DaSw6yZYTNJwk",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyTmFtZSI6InVzZXIwMDEiLCJzdWIiOiIxIiwiaWF0IjoxNzQ0OTEwOTUwLCJleHAiOjE3NDQ5MTE4NTB9.dzkVzhMCiR7813Hje6TQdSvL2rvJUx9PJeQy85r_mUk",
 							"type": "string"
 						}
 					]
@@ -81,18 +88,17 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:8080/api/gateway/test",
-					"protocol": "http",
+					"raw": "https://6b45-3-27-141-54.ngrok-free.app/api/gateway/v1/test",
+					"protocol": "https",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"6b45-3-27-141-54",
+						"ngrok-free",
+						"app"
 					],
-					"port": "8080",
 					"path": [
 						"api",
 						"gateway",
+						"v1",
 						"test"
 					]
 				}
@@ -109,7 +115,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicmVmcmVzaCIsInVzZXJOYW1lIjoidXNlcjAwMSIsInN1YiI6IjEiLCJpYXQiOjE3NDQ3MTA3OTksImV4cCI6MTc0NTMxNTU5OX0.bvtfJDdvBN_cUzukUeGxSdjcQOWdZbTBbStHvdD0MjI\"\r\n}",
+					"raw": "{\r\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjoicmVmcmVzaCIsInVzZXJOYW1lIjoidXNlcjAwMSIsInN1YiI6IjEiLCJpYXQiOjE3NDQ5MTA5NTAsImV4cCI6MTc0NTUxNTc1MH0.7b6Tk_2edLVxQ8jndiarg1pqYtM5bjdoa9ON8L6muNA\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -117,19 +123,18 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8080/api/gateway/refresh/token",
-					"protocol": "http",
+					"raw": "https://6b45-3-27-141-54.ngrok-free.app/api/gateway/refresh/v1/token",
+					"protocol": "https",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"6b45-3-27-141-54",
+						"ngrok-free",
+						"app"
 					],
-					"port": "8080",
 					"path": [
 						"api",
 						"gateway",
 						"refresh",
+						"v1",
 						"token"
 					]
 				}
