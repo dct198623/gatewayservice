@@ -31,8 +31,8 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final List<String> EXCLUDED_PATHS = List.of(
-            "/api/gateway/login",
-            "/api/gateway/refresh/token"
+            "/api/gateway/v1/login",
+            "/api/gateway/v1/refresh/token"
     );
 
     @Autowired
