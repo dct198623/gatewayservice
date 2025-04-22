@@ -26,7 +26,7 @@ public class AuthController {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    @PostMapping("/login")
+    @PostMapping("/v1/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody @Valid LoginRequest request) {
         String account = request.getAccount();
         String password = request.getPassword();
@@ -55,12 +55,12 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/test")
+    @GetMapping("/v1/test")
     public ResponseEntity<ApiResponse<String>> testEndpoint() {
         return ResponseEntity.ok(ApiResponse.success("Hello!"));
     }
 
-    @PostMapping("/refresh/token")
+    @PostMapping("/v1/refresh/token")
     public ResponseEntity<ApiResponse<Map<String, Object>>> refreshToken(@RequestBody RefreshTokenRequest request) {
         String refreshToken = request.getRefreshToken();
 
