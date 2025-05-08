@@ -32,7 +32,9 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     private static final List<String> EXCLUDED_PATHS = List.of(
             "/api/gateway/v1/login",
-            "/api/gateway/v1/refresh/token"
+            "/api/gateway/v1/refresh/token",
+            "/api/linebot/v1/actuator/health",
+            "/api/linebot/v1/webhook"
     );
 
     @Autowired
