@@ -6,6 +6,9 @@ spring:
       discovery:
         locator:
           enabled: false # 不啟用服務發現
+      httpclient:
+        connect-timeout: 5000       # 連線 timeout
+        response-timeout: 10s       # 回應 timeout
       routes:
         - id: gatewayservice
           uri: http://localhost:8080 # 使用固定地址
