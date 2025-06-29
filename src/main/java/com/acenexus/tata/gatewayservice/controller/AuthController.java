@@ -1,6 +1,8 @@
 package com.acenexus.tata.gatewayservice.controller;
 
 import com.acenexus.tata.gatewayservice.client.AccountServiceClient;
+import com.acenexus.tata.gatewayservice.dto.AccountLoginRequest;
+import com.acenexus.tata.gatewayservice.dto.AccountLoginResponse;
 import com.acenexus.tata.gatewayservice.dto.LoginRequest;
 import com.acenexus.tata.gatewayservice.dto.LoginResponse;
 import com.acenexus.tata.gatewayservice.dto.RefreshTokenRequest;
@@ -35,7 +37,7 @@ public class AuthController {
 
     @Operation(summary = "User login", responses = {
             @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = LoginResponse.class)))
-    }, security = @SecurityRequirement(name = "Authorization"))
+    })
     @PostMapping("/v1/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
         String account = request.getAccount();
@@ -47,18 +49,26 @@ public class AuthController {
         }
 
         try {
-            // TODO 模擬登入 accountServiceClient.login();
-            if (!"ace".equals(account) || !"123".equals(password)) {
-                log.warn("Login failed for account '{}': Invalid credentials", account);
+            AccountLoginRequest accountLoginRequest = new AccountLoginRequest(account, password);
+
+            // 呼叫 Account 服務進行驗證
+            AccountLoginResponse accountLoginResponse = accountServiceClient.login(accountLoginRequest);
+
+            if (accountLoginResponse == null || accountLoginResponse.getId() == null) {
+                log.warn("Login failed: invalid response from account service for account '{}'", account);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
             }
 
-            String userId = "1";
-            String userName = "user001";
-            String accessToken = jwtTokenProvider.generateAccessToken(userId, userName);
-            String refreshToken = jwtTokenProvider.generateRefreshToken(userId, userName);
-            LoginResponse data = new LoginResponse(userId, userName, accessToken, refreshToken);
+            String userName = accountLoginResponse.getName() != null ? accountLoginResponse.getName() : account;
+
+            String accessToken = jwtTokenProvider.generateAccessToken(accountLoginResponse.getId(), userName);
+            String refreshToken = jwtTokenProvider.generateRefreshToken(accountLoginResponse.getId(), userName);
+
+            LoginResponse data = new LoginResponse(accountLoginResponse.getId(), userName, accessToken, refreshToken);
+
+            log.info("Login successful for account '{}', userId: {}", account, accountLoginResponse.getId());
             return ResponseEntity.ok(data);
+
         } catch (Exception e) {
             log.error("Login error for account '{}': {}", account, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing your login");
@@ -79,7 +89,7 @@ public class AuthController {
 
         try {
             String newAccessToken = jwtTokenProvider.refreshAccessToken(refreshToken);
-            String userId = jwtTokenProvider.extractUserId(refreshToken);
+            Long userId = jwtTokenProvider.extractUserId(refreshToken);
             String userName = jwtTokenProvider.extractUserName(refreshToken);
 
             RefreshTokenResponse data = new RefreshTokenResponse(userId, userName, newAccessToken, refreshToken);

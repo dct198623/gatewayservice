@@ -29,25 +29,25 @@ public class JwtTokenProvider {
     private static final long ACCESS_TOKEN_EXPIRATION = 15 * 60 * 1000; // 15 minutes
     private static final long REFRESH_TOKEN_EXPIRATION = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-    public String generateAccessToken(String userId, String username) {
+    public String generateAccessToken(Long userId, String username) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userName", username);
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(userId)
+                .setSubject(String.valueOf(userId))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))
                 .signWith(signingKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String generateRefreshToken(String userId, String username) {
+    public String generateRefreshToken(Long userId, String username) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "refresh");
         claims.put("userName", username);
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(userId)
+                .setSubject(String.valueOf(userId))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
                 .signWith(signingKey, SignatureAlgorithm.HS256)
@@ -82,8 +82,9 @@ public class JwtTokenProvider {
                 .getBody();
     }
 
-    public String extractUserId(String token) {
-        return extractAllClaims(token).getSubject();
+    public Long extractUserId(String token) {
+        String userIdStr = extractAllClaims(token).getSubject();
+        return Long.valueOf(userIdStr);
     }
 
     public String extractUserName(String token) {
@@ -99,7 +100,7 @@ public class JwtTokenProvider {
         if (!"refresh".equals(type)) {
             throw new RuntimeException("Not a refresh token");
         }
-        String userId = claims.getSubject();
+        Long userId = extractUserId(refreshToken);
         String userName = claims.get("userName", String.class);
         return generateAccessToken(userId, userName);
     }
