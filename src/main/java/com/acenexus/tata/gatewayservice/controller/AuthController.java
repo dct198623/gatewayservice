@@ -1,5 +1,6 @@
 package com.acenexus.tata.gatewayservice.controller;
 
+import com.acenexus.tata.gatewayservice.client.AccountServiceClient;
 import com.acenexus.tata.gatewayservice.dto.LoginRequest;
 import com.acenexus.tata.gatewayservice.dto.LoginResponse;
 import com.acenexus.tata.gatewayservice.dto.RefreshTokenRequest;
@@ -29,6 +30,9 @@ public class AuthController {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    @Autowired
+    private AccountServiceClient accountServiceClient;
+
     @Operation(summary = "User login", responses = {
             @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = LoginResponse.class)))
     }, security = @SecurityRequirement(name = "Authorization"))
@@ -43,7 +47,7 @@ public class AuthController {
         }
 
         try {
-            // TODO 模擬登入
+            // TODO 模擬登入 accountServiceClient.login();
             if (!"ace".equals(account) || !"123".equals(password)) {
                 log.warn("Login failed for account '{}': Invalid credentials", account);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");

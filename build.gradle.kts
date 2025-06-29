@@ -57,6 +57,9 @@ dependencies {
 
     // Swagger
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.7.0")
+
+    // openfeign
+    implementation ("org.springframework.cloud:spring-cloud-starter-openfeign")
 }
 
 dependencyManagement {
