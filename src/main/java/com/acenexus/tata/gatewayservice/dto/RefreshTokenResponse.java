@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequest {
-    private String account;
-    private String password;
+public class RefreshTokenResponse {
+    private String id;
+    private String username;
+    private String token;
+    private String refreshToken;
 }
