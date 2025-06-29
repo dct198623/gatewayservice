@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RefreshTokenResponse {
-    private String id;
+    private Long id;
     private String username;
     private String token;
     private String refreshToken;
