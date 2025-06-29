@@ -1,6 +1,5 @@
 package com.acenexus.tata.gatewayservice.filter;
 
-import com.acenexus.tata.gatewayservice.define.ApiResponse;
 import com.acenexus.tata.gatewayservice.provider.JwtTokenProvider;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,7 +19,9 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class JwtAuthFilter implements GlobalFilter, Ordered {
@@ -82,10 +83,12 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         return EXCLUDED_PATHS.stream().anyMatch(path::startsWith);
     }
 
-    private static <T> Mono<Void> onError(ServerWebExchange exchange, String message, HttpStatus status) {
-        ApiResponse<T> response = ApiResponse.error(message);
+    private static Mono<Void> onError(ServerWebExchange exchange, String message, HttpStatus status) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("error", message);
+        errorResponse.put("status", status.value());
 
-        byte[] responseBytes = getResponseBytes(response);
+        byte[] responseBytes = getResponseBytes(errorResponse);
 
         exchange.getResponse().setStatusCode(status);
         exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
@@ -93,11 +96,11 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
                 .bufferFactory().wrap(responseBytes)));
     }
 
-    private static <T> byte[] getResponseBytes(ApiResponse<T> response) {
+    private static byte[] getResponseBytes(Object response) {
         try {
             return objectMapper.writeValueAsString(response).getBytes(StandardCharsets.UTF_8);
         } catch (JsonProcessingException e) {
-            return "{\"status\":1,\"message\":\"Server Error\"}".getBytes(StandardCharsets.UTF_8);
+            return "{\"error\":\"Server Error\",\"status\":500}".getBytes(StandardCharsets.UTF_8);
         }
     }
 
