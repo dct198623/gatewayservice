@@ -36,42 +36,22 @@ public class AuthController {
     private AccountService accountService;
 
     @Operation(summary = "User login", responses = {
-            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = LoginResponse.class)))
+            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = LoginResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "401", description = "Authentication failed")
     })
     @PostMapping("/v1/login")
-    public Mono<ResponseEntity<?>> login(@RequestBody @Valid LoginRequest request) {
+    public Mono<ResponseEntity<LoginResponse>> login(@RequestBody @Valid LoginRequest request) {
         String account = request.getAccount();
         String password = request.getPassword();
 
         if (account == null || password == null || account.isBlank() || password.isBlank()) {
             log.warn("Login failed: missing account or password");
-            return Mono.just(ResponseEntity.badRequest().body("Account and password are required"));
+            return Mono.just(ResponseEntity.badRequest().build());
         }
 
         AccountLoginRequest accountLoginRequest = new AccountLoginRequest(account, password);
-
-        return accountService.login(accountLoginRequest)
-                .map(accountLoginResponse -> {
-                    if (accountLoginResponse == null || accountLoginResponse.getId() == null) {
-                        log.warn("Login failed: invalid response from account service for account '{}'", account);
-                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-                    }
-
-                    String userName = accountLoginResponse.getName() != null ? accountLoginResponse.getName() : account;
-
-                    String accessToken = jwtTokenProvider.generateAccessToken(accountLoginResponse.getId(), userName);
-                    String refreshToken = jwtTokenProvider.generateRefreshToken(accountLoginResponse.getId(), userName);
-
-                    LoginResponse data = new LoginResponse(accountLoginResponse.getId(), userName, accessToken, refreshToken);
-
-                    log.info("Login successful for account '{}', userId: {}", account, accountLoginResponse.getId());
-                    return ResponseEntity.ok(data);
-                })
-                .onErrorResume(e -> {
-                    log.error("Login error for account '{}': {}", account, e.getMessage(), e);
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body("An error occurred while processing your login"));
-                });
+        return accountService.login(accountLoginRequest);
     }
 
     @Operation(summary = "Refresh access token", responses = {
