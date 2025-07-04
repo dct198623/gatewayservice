@@ -17,7 +17,6 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,24 +57,11 @@ public class AuthController {
             @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = RefreshTokenResponse.class)))
     }, security = @SecurityRequirement(name = "Authorization"))
     @PostMapping("/v1/refresh/token")
-    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
-        String refreshToken = request.getRefreshToken();
-
-        if (refreshToken == null || refreshToken.isBlank()) {
+    public Mono<ResponseEntity<RefreshTokenResponse>> refreshToken(@RequestBody RefreshTokenRequest request) {
+        if (request.getRefreshToken() == null || request.getRefreshToken().isBlank()) {
             log.warn("Token refresh failed: missing refreshToken");
-            return ResponseEntity.badRequest().body("Refresh token is required");
+            return Mono.just(ResponseEntity.badRequest().build());
         }
-
-        try {
-            String newAccessToken = jwtTokenProvider.refreshAccessToken(refreshToken);
-            Long userId = jwtTokenProvider.extractUserId(refreshToken);
-            String userName = jwtTokenProvider.extractUserName(refreshToken);
-
-            RefreshTokenResponse data = new RefreshTokenResponse(userId, userName, newAccessToken, refreshToken);
-            return ResponseEntity.ok(data);
-        } catch (RuntimeException e) {
-            log.error("Token refresh error for refreshToken '{}': {}", refreshToken, e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error refreshing token: " + e.getMessage());
-        }
+        return accountService.refreshToken(request.getRefreshToken());
     }
 }

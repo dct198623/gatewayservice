@@ -3,6 +3,7 @@ package com.acenexus.tata.gatewayservice.service;
 import com.acenexus.tata.gatewayservice.client.AccountServiceClient;
 import com.acenexus.tata.gatewayservice.dto.AccountLoginRequest;
 import com.acenexus.tata.gatewayservice.dto.LoginResponse;
+import com.acenexus.tata.gatewayservice.dto.RefreshTokenResponse;
 import com.acenexus.tata.gatewayservice.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,19 @@ public class AccountService {
                     log.error("Login error: {}", e.getMessage(), e);
                     return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
                 });
+    }
+
+    public Mono<ResponseEntity<RefreshTokenResponse>> refreshToken(String refreshToken) {
+        try {
+            String newAccessToken = jwtTokenProvider.refreshAccessToken(refreshToken);
+            Long userId = jwtTokenProvider.extractUserId(refreshToken);
+            String userName = jwtTokenProvider.extractUserName(refreshToken);
+            RefreshTokenResponse data = new RefreshTokenResponse(userId, userName, newAccessToken, refreshToken);
+            return Mono.just(ResponseEntity.ok(data));
+        } catch (RuntimeException e) {
+            log.error("Token refresh error for refreshToken '{}': {}", refreshToken, e.getMessage(), e);
+            return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+        }
     }
 
 }
