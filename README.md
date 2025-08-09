@@ -106,13 +106,13 @@ git push origin --tags
    # 啟動容器（含環境變數設定）
    docker run -di --name=gatewayservice \
      -p 8080:8080 \
-     -e SERVER_HOST=127.0.0.1 \
+     -e SERVER_HOST=3.27.141.54 \
      -e SERVER_PORT=8080 \
      -e SPRING_PROFILES_ACTIVE=prod \
      -e CONFIG_SERVER_USERNAME=admin \
      -e CONFIG_SERVER_PASSWORD=password \
-     -e CONFIG_SERVER_URI=http://127.0.0.1:8888 \
-     -e EUREKA_SERVER_HOST=127.0.0.1 \
+     -e CONFIG_SERVER_URI=http://3.25.200.179:8888 \
+     -e EUREKA_SERVER_HOST=3.25.200.179 \
      -e EUREKA_SERVER_PORT=8761 \
      gatewayservice
    ```
